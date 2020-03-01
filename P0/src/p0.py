@@ -2,11 +2,18 @@
 # Modified for documentation by Jaques Grobler
 # License: BSD 3 clause
 
-from matplotlib.colors import ListedColormap
+# Seed
+seed = 1
+
+# Matplotlib imports
 import matplotlib.pyplot as plt
+from matplotlib.colors import ListedColormap
 from mpl_toolkits.mplot3d import Axes3D
+
+# Scikit Learn imports
 from sklearn import datasets
 from sklearn.decomposition import PCA
+from sklearn.model_selection import train_test_split
 
 # Reads iris dataset
 iris = datasets.load_iris()
@@ -35,5 +42,10 @@ plt.xticks(())
 plt.yticks(())
 
 plt.legend(handles=scatter.legend_elements()[0], labels=['Flower 0', 'Flower 1', 'Flower 2'])
+
+# Gets training and test sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=seed)
+print(y_train)
+print(y_test)
 
 plt.show()
