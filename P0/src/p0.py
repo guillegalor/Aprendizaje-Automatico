@@ -7,6 +7,7 @@ seed = 1
 
 # General imports
 import collections, numpy
+from math import pi, sin, cos
 
 # Matplotlib imports
 import matplotlib.pyplot as plt
@@ -49,7 +50,7 @@ plt.xticks(())
 plt.yticks(())
 
 plt.legend(handles=scatter.legend_elements()[0], labels=['Flower 0', 'Flower 1', 'Flower 2'])
-# plt.show()
+plt.show()
 
 #----------------------------------------
 #------------ Parte 2 -------------------
@@ -77,3 +78,22 @@ for features, label in zip(X, y):
 
 print(collections.Counter(y_train))
 print(collections.Counter(y_test))
+
+#----------------------------------------
+#------------ Parte 3 -------------------
+#----------------------------------------
+
+# Get 100 equidistant values in [0,2pi]
+X = [n*2*pi/99 for n in range(100)]
+
+fig, ax = plt.subplots()
+
+#Plot something
+s, = ax.plot(X, [sin(x) for x in X], color='r', ls="--", label="$sin(x)$")
+c, = ax.plot(X, [cos(x) for x in X], color='g', ls="--", label="$cos(x)$")
+sc, = ax.plot(X, [sin(x) + cos(x) for x in X], color='b', ls="--", label="$sin(x) + cos(x)$")
+
+#Create legend from custom artist/label lists
+ax.legend([s, c, sc], ["$sin(x)$", "$cos(x)$", "$sin(x) + cos(x)$"])
+
+plt.show()
