@@ -39,8 +39,6 @@ plt.ylabel('Petal width')
 
 plt.xlim(x_min, x_max)
 plt.ylim(y_min, y_max)
-plt.xticks(())
-plt.yticks(())
 
 plt.legend(handles=scatter.legend_elements()[0], labels=['Flower 0', 'Flower 1', 'Flower 2'])
 plt.show()
