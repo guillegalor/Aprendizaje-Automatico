@@ -40,7 +40,8 @@ plt.ylabel('Petal width')
 plt.xlim(x_min, x_max)
 plt.ylim(y_min, y_max)
 
-plt.legend(handles=scatter.legend_elements()[0], labels=['Flower 0', 'Flower 1', 'Flower 2'])
+plt.legend(handles=scatter.legend_elements()[0],
+        labels=[iris.target_names[0], iris.target_names[1], iris.target_names[2]])
 plt.show()
 
 #----------------------------------------
