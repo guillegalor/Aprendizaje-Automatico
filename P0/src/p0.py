@@ -5,6 +5,9 @@
 # Seed
 seed = 1
 
+# General imports
+import collections, numpy
+
 # Matplotlib imports
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
@@ -14,6 +17,10 @@ from mpl_toolkits.mplot3d import Axes3D
 from sklearn import datasets
 from sklearn.decomposition import PCA
 from sklearn.model_selection import train_test_split
+
+#----------------------------------------
+#------------ Parte 1 -------------------
+#----------------------------------------
 
 # Reads iris dataset
 iris = datasets.load_iris()
@@ -42,10 +49,33 @@ plt.xticks(())
 plt.yticks(())
 
 plt.legend(handles=scatter.legend_elements()[0], labels=['Flower 0', 'Flower 1', 'Flower 2'])
+# plt.show()
+
+#----------------------------------------
+#------------ Parte 2 -------------------
+#----------------------------------------
 
 # Gets training and test sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=seed)
-print(y_train)
-print(y_test)
+X_train = []
+X_test = []
+y_train = []
+y_test = []
 
-plt.show()
+print(X)
+
+# Dictionary to determine if an element goes to test or training set
+keys= dict.fromkeys(y)
+counter = {key: 0 for key in keys}
+
+for features, label in zip(X, y):
+    if counter[label] != 4:
+        X_train.append(features)
+        y_train.append(label)
+    else:
+        X_test.append(features)
+        y_test.append(label)
+
+    counter[label] = (counter[label] + 1) % 5
+
+print(collections.Counter(y_train))
+print(collections.Counter(y_test))
