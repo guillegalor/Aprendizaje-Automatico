@@ -69,8 +69,11 @@ for features, label in zip(X, y):
 
     counter[label] = (counter[label] + 1) % 5
 
-print(collections.Counter(y_train))
-print(collections.Counter(y_test))
+# Shows proportions are kept
+print("Training")
+print("Proporciones: ", [p / len(X_train) for p in collections.Counter(y_train).values()])
+print("Test")
+print("Proporciones: ", [p / len(X_test) for p in collections.Counter(y_test).values()])
 
 #----------------------------------------
 #------------ Parte 3 -------------------
