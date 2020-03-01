@@ -1,5 +1,6 @@
 # General imports
 import collections, numpy
+import random
 from math import pi, sin, cos
 
 # Matplotlib imports
@@ -11,6 +12,9 @@ from mpl_toolkits.mplot3d import Axes3D
 from sklearn import datasets
 from sklearn.decomposition import PCA
 from sklearn.model_selection import train_test_split
+
+# Sets seed for random
+random.seed(1)
 
 #----------------------------------------
 #------------ Parte 1 -------------------
@@ -58,7 +62,11 @@ y_test = []
 keys= dict.fromkeys(y)
 counter = {key: 0 for key in keys}
 
-for features, label in zip(X, y):
+# Shuffles randomly the elements
+zipped = list(zip(X, y))
+random.shuffle(zipped)
+
+for features, label in zipped:
     if counter[label] != 4:
         X_train.append(features)
         y_train.append(label)
