@@ -7,9 +7,11 @@ from mpl_toolkits.mplot3d import Axes3D
 from sklearn import datasets
 from sklearn.decomposition import PCA
 
-# import some data to play with
+# Reads iris dataset
 iris = datasets.load_iris()
-X = iris.data[:, :2]  # we only take the first two features.
+
+# Gets features and labels
+X = iris.data[:, -2:]  # Take only last 2 features
 y = iris.target
 
 x_min, x_max = X[:, 0].min() - .5, X[:, 0].max() + .5
