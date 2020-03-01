@@ -61,8 +61,6 @@ X_test = []
 y_train = []
 y_test = []
 
-print(X)
-
 # Dictionary to determine if an element goes to test or training set
 keys= dict.fromkeys(y)
 counter = {key: 0 for key in keys}
