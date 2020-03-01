@@ -2,9 +2,6 @@
 # Modified for documentation by Jaques Grobler
 # License: BSD 3 clause
 
-# Seed
-seed = 1
-
 # General imports
 import collections, numpy
 from math import pi, sin, cos
@@ -31,7 +28,7 @@ X = iris.data[:, -2:]  # Take only last 2 features
 y = iris.target
 
 # Creates figure for plotting
-fig, ax = plt.subplots()
+plt.figure()
 plt.clf()
 
 # Gets limits for the plot
