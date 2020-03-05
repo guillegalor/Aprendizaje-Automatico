@@ -2,23 +2,30 @@
 from math import inf, exp
 import numpy as np
 
+#----------------------------------------#
+#---------- Auxiliar Functions ----------#
+#----------------------------------------#
+
 def to_numpy(func):
-  """
-  Decorator function to convert functions
-  to Numpy format
-  """
+    """
+    Decorator function to convert functions
+    to Numpy format
+    """
 
-  def numpy_func(w):
-    return func(*w)
+    def numpy_func(w):
+        return func(*w)
 
-  return numpy_func
+    return numpy_func
+
+def wait():
+    input("\n--- Pulsar tecla para continuar ---\n")
 
 #----------------------------------------#
 #------------ Ejercicio 1 ---------------#
 #----------------------------------------#
 
 # Apartado 1.1
-def gradient_descent(w, lr, grad_f, f, max_iters, epsilon=-inf):
+def gradient_descent(w, lr, f, grad_f, max_iters, epsilon=-inf):
     """
     Arguments:
     - w: Initial point
@@ -59,3 +66,16 @@ def Ev(u, v):
 @to_numpy
 def gradE(u, v):
     return np.array([Eu(u, v), Ev(u, v)])
+
+def main():
+    w = (1, 1)
+    lr = 0.1
+    minimun, iters = gradient_descent(w, lr, E, gradE, 10000000, 10**(-14))
+
+    # TODO: Mostrar expresión del gradiente
+    print ('GRADIENTE DESCENDENTE')
+    print ('Ejercicio 1')
+    print ('Numero de iteraciones: ', iters)
+    print ('Coordenadas obtenidas: (', minimun[0], ', ', minimun[1],')')
+
+    input("\n--- Pulsar tecla para continuar ---\n")
