@@ -2,9 +2,17 @@
 from math import inf
 from sympy import *
 
-#----------------------------------------
-#------------ Ejercicio 1 ---------------
-#----------------------------------------
+def to_numpy(func):
+  """Decorador para convertir funciones a versión NumPy"""
+
+  def numpy_func(w):
+    return func(*w)
+
+  return numpy_func
+
+#----------------------------------------#
+#------------ Ejercicio 1 ---------------#
+#----------------------------------------#
 
 # Apartado 1.1
 def gradient_descent(w, lr, grad_f, f, max_iters, epsilon):
@@ -18,3 +26,6 @@ def gradient_descent(w, lr, grad_f, f, max_iters, epsilon):
 
 # Apartado 1.2
 # Function to minize: E(u,v) = (ue^v - 2ve^(-u))^2
+
+def E(w):
+    return
