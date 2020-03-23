@@ -1,6 +1,7 @@
 # General imports
 from math import inf, exp, sin, cos, pi
 import numpy as np
+import matplotlib.pyplot as plt
 
 #----------------------------------------#
 #---------- Auxiliar Functions ----------#
@@ -72,16 +73,53 @@ def main_1_2():
     lr = 0.1
     minimun, iters = gradient_descent(w, lr, E, gradE, 10000000, 10**(-14))
 
-    # TODO: Mostrar expresión del gradiente
     print ('GRADIENTE DESCENDENTE')
     print ('Ejercicio 1')
     print ('Numero de iteraciones: ', iters)
     print ('Coordenadas obtenidas: (', minimun[0], ', ', minimun[1],')')
 
-    input("\n--- Pulsar tecla para continuar ---\n")
+    wait()
 
 # Apartado 1.3
 # Function to minize: f(x,y) = (x-2)^2 + 2(y+2)^2 + 2sin(2 \pi x)sin(2 \pi y)
 @to_numpy
 def f(x, y):
     return (x-2)**2 + 2*(y +2)**2 + 2*sin(2*pi*x)*sin(2*pi*y)
+
+def fx(x, y):
+    return 2*(2*pi*cos(2*pi*x)*sin(2*pi*y) + x - 2)
+
+def fy(x, y):
+    return 4*(pi*sin(2*pi*x)*cos(2*pi*y) + y + 2)
+
+@to_numpy
+def gradf(x, y):
+    return np.array([fx(x, y), fy(x, y)])
+
+def gd_graph(w, lr, f, grad_f, max_iters):
+    iters = 0
+    values_f = []
+
+    while iters < max_iters:
+        print(f(w))
+        values_f.append(f(w))
+        w = w - lr * grad_f(w)
+        iters += 1
+
+    plt.plot(range(max_iters), values_f, 'bo')
+    plt.xlabel('Iteraciones')
+    plt.ylabel('f(x,y)')
+    plt.show()
+
+def main_1_3a():
+    w = (1, 1)
+
+    print ('Resultados ejercicio 2\n')
+    print ('\nGrafica con learning rate igual a 0.01')
+    gd_graph(w, 0.01, f, gradf, 50)
+    wait()
+    print ('\nGrafica con learning rate igual a 0.1')
+    gd_graph(w, 0.1, f, gradf, 50)
+    wait()
+
+main_1_3a()
