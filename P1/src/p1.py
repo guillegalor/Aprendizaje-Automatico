@@ -1,5 +1,5 @@
 # General imports
-from math import inf, exp
+from math import inf, exp, sin, cos, pi
 import numpy as np
 
 #----------------------------------------#
@@ -41,7 +41,7 @@ def gradient_descent(w, lr, f, grad_f, max_iters, epsilon=-inf):
     """
     iters = 0
 
-    while iters < max_iters and f(w) < epsilon:
+    while iters < max_iters and f(w) > epsilon:
         w = w - lr * grad_f(w)
         iters += 1
 
@@ -67,7 +67,7 @@ def Ev(u, v):
 def gradE(u, v):
     return np.array([Eu(u, v), Ev(u, v)])
 
-def main():
+def main_1_2():
     w = (1, 1)
     lr = 0.1
     minimun, iters = gradient_descent(w, lr, E, gradE, 10000000, 10**(-14))
@@ -79,3 +79,9 @@ def main():
     print ('Coordenadas obtenidas: (', minimun[0], ', ', minimun[1],')')
 
     input("\n--- Pulsar tecla para continuar ---\n")
+
+# Apartado 1.3
+# Function to minize: f(x,y) = (x-2)^2 + 2(y+2)^2 + 2sin(2 \pi x)sin(2 \pi y)
+@to_numpy
+def f(x, y):
+    return (x-2)**2 + 2*(y +2)**2 + 2*sin(2*pi*x)*sin(2*pi*y)
