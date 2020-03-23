@@ -101,7 +101,6 @@ def gd_graph(w, lr, f, grad_f, max_iters):
     values_f = []
 
     while iters < max_iters:
-        print(f(w))
         values_f.append(f(w))
         w = w - lr * grad_f(w)
         iters += 1
@@ -122,4 +121,37 @@ def main_1_3a():
     gd_graph(w, 0.1, f, gradf, 50)
     wait()
 
-main_1_3a()
+def main_1_3b():
+    lr = 0.01
+
+    w = (2.1, -2.1)
+    w, _ = gradient_descent(w, lr, f, gradf, 50)
+    print ('Punto de inicio: (2.1, -2.1)\n')
+    print ('(x,y) = (', w[0], ', ', w[1],')\n')
+    print ('Valor minimo: ', f(w))
+
+    wait()
+
+    w = (3.0, -3.0)
+    w, _ = gradient_descent(w, lr, f, gradf, 50)
+    print ('Punto de inicio: (3.0, -3.0)\n')
+    print ('(x,y) = (', w[0], ', ', w[1],')\n')
+    print ('Valor minimo: ',f(w))
+
+    wait()
+
+    w = (1.5, 1.5)
+    w, _ = gradient_descent(w, lr, f, gradf, 50)
+    print ('Punto de inicio: (1.5, 1.5)\n')
+    print ('(x,y) = (', w[0], ', ', w[1],')\n')
+    print ('Valor minimo: ',f(w))
+
+    wait()
+
+    w = (1.0, -1.0)
+    w, _ = gradient_descent(w, lr, f, gradf, 50)
+    print ('Punto de inicio: (1.0, -1.0)\n')
+    print ('(x,y) = (', w[0], ', ', w[1],')\n')
+    print ('Valor mínimo: ',f(w))
+
+    wait()
