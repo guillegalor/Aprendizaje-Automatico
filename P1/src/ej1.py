@@ -136,7 +136,7 @@ def main_1_3b():
     w, _ = gradient_descent(w, lr, f, gradf, 50)
     print ('Punto de inicio: (3.0, -3.0)\n')
     print ('(x,y) = (', w[0], ', ', w[1],')\n')
-    print ('Valor minimo: ',f(w))
+    print ('Valor minimo: ', f(w))
 
     wait()
 
@@ -144,7 +144,7 @@ def main_1_3b():
     w, _ = gradient_descent(w, lr, f, gradf, 50)
     print ('Punto de inicio: (1.5, 1.5)\n')
     print ('(x,y) = (', w[0], ', ', w[1],')\n')
-    print ('Valor minimo: ',f(w))
+    print ('Valor minimo: ', f(w))
 
     wait()
 
@@ -152,6 +152,6 @@ def main_1_3b():
     w, _ = gradient_descent(w, lr, f, gradf, 50)
     print ('Punto de inicio: (1.0, -1.0)\n')
     print ('(x,y) = (', w[0], ', ', w[1],')\n')
-    print ('Valor mínimo: ',f(w))
+    print ('Valor mínimo: ', f(w))
 
     wait()
