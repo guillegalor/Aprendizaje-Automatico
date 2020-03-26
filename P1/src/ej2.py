@@ -6,6 +6,9 @@ import random
 # Set seed for random
 random.seed(1)
 
+def wait():
+    input("\n--- Pulsar tecla para continuar ---\n")
+
 #----------------------------------------#
 #------------ Ejercicio 2 ---------------#
 #----------------------------------------#
@@ -42,7 +45,7 @@ def dErr(x, y, w):
     return 2/len(x) * (x.T.dot(x.dot(w) - y))
 
 # Stochastic gradiente descent
-def sgd(x, y, lr, max_iters, batch_size):
+def sgd(x, y, lr=0.01, max_iters=1000, batch_size=32):
     """
     Stochastic gradient descent applied to linear regression
     - x              : Data (array of arrays with features of each element)
@@ -73,3 +76,19 @@ def sgd(x, y, lr, max_iters, batch_size):
             batch_start = 0
 
     return w
+
+# Data reading
+x, y = readData('../data/X_train.npy', '../data/y_train.npy')
+# Test data reading
+x_test, y_test = readData('../data/X_test.npy', '../data/y_test.npy')
+
+print ('EJERCICIO SOBRE REGRESION LINEAL\n')
+print ('Ejercicio 1\n')
+# Gradiente descendente estocastico
+w = sgd(x, y)
+
+print ('Bondad del resultado para grad. descendente estocastico:\n')
+print ("Ein: ", Err(x, y, w))
+print ("Eout: ", Err(x_test, y_test, w))
+
+wait()
