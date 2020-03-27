@@ -47,7 +47,7 @@ def readData(file_x, file_y):
             x.append(np.array([1, datax[i][0], datax[i][1]]))
 
     x = np.array(x, np.float64)
-    y = np.array(y, np.float64)
+    y = np.array(y, np.float64)[:, None]
 
     return x, y
 
@@ -70,7 +70,7 @@ def sgd(x, y, lr=0.01, max_iters=1000, batch_size=32):
     - minibatch_size : Batch size
     """
 
-    w = np.zeros(3)
+    w = np.zeros((x.shape[1], 1))
     iters = 0
     idxs = [i for i in range(len(x))]
     batch_start = 0
@@ -112,7 +112,6 @@ def pseudoinverse(x, y):
 x, y = readData('../data/X_train.npy', '../data/y_train.npy')
 # Test data reading
 x_test, y_test = readData('../data/X_test.npy', '../data/y_test.npy')
-print(x.shape, y.shape)
 
 print ('EJERCICIO SOBRE REGRESION LINEAL\n')
 print ('Ejercicio 1\n')
@@ -156,17 +155,73 @@ y = f(X[:900].T)
 # Generate the remaining 10% randomly
 y_random = np.random.choice([-1, 1], 100)
 # Join everything
-y = np.hstack((y, y_random))
+y = np.hstack((y, y_random))[:, None]
 
 # Generates the label map and
-scatter = plt.scatter(X[:, 0], X[:, 1], c=y, cmap=ListedColormap(['r', 'g']))
+scatter = plt.scatter(X[:, 0], X[:, 1], c=y.flatten(), cmap=ListedColormap(['r', 'g']))
 plt.show()
 
 # c) Ajustar un modelo de regresión lineal utilizando el gradiente descendiente estocástico
+# Creates feature vector
 X = np.array([[1, x[0], x[1]] for x in X])
 
 w = sgd(X,y)
-print ('Bondad del resultado en el experimento para grad. descendente estocástico:\n')
+print ('Bondad del resultado en el experimento para grad. descendente estocástico: \n')
 print ("Ein: ", Err(X, y, w))
 
-# Ejecutar el experimento a)-c) 1000 veces
+# d) Ejecutar el experimento a)-c) 1000 veces
+
+# Agroup data generation in one unique function
+def data_genarator(linear=True):
+    X = simula_unif(1000, 2, 1)
+    y = f(X[:900].T)
+    y_random = np.random.choice([-1, 1], 100)
+    y = np.hstack((y, y_random))[:, None]
+    if (linear):
+        X = np.array([[1, x[0], x[1]] for x in X])
+    else:
+        X = np.array([[1, x[0], x[1], x[0]*x[1], x[0]*x[0], x[1]*x[1]] for x in X])
+
+    return X, y
+
+def experiment(linear=True):
+    x, y = data_genarator(linear)
+    x_test, y_test = data_genarator(linear)
+    w = sgd(x,y)
+
+    # Training error
+    Ein = Err(x, y, w)
+    # Test error
+    Eout = Err(x_test, y_test, w)
+
+    return Ein, Eout
+
+# Perform the 1000 experiments
+Eins = []
+Eouts = []
+for _ in range(1000):
+    Ein, Eout = experiment()
+    Eins.append(Ein)
+    Eouts.append(Eout)
+
+Ein_medio = sum(Eins)/1000
+Eout_medio = sum(Eouts)/1000
+
+print ('Errores Ein y Eout medios tras 1000reps del experimento lineal:\n')
+print ("Ein media: ", Ein_medio)
+print ("Eout media: ", Eout_medio)
+
+# Perform the 1000 no linear experiments
+Eins = []
+Eouts = []
+for _ in range(1000):
+    Ein, Eout = experiment(linear=False)
+    Eins.append(Ein)
+    Eouts.append(Eout)
+
+Ein_medio = sum(Eins)/1000
+Eout_medio = sum(Eouts)/1000
+
+print ('Errores Ein y Eout medios tras 1000reps del experimento no lineal:\n')
+print ("Ein media: ", Ein_medio)
+print ("Eout media: ", Eout_medio)

@@ -21,10 +21,6 @@ def to_numpy(func):
 def wait():
     input("\n--- Pulsar tecla para continuar ---\n")
 
-#----------------------------------------#
-#------------ Ejercicio 1 ---------------#
-#----------------------------------------#
-
 # Apartado 1.1
 def gradient_descent(w, lr, f, grad_f, max_iters, epsilon=-inf):
     """
