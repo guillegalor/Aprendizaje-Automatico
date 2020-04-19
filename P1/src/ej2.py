@@ -117,15 +117,33 @@ print ('EJERCICIO SOBRE REGRESION LINEAL\n')
 print ('Ejercicio 1\n')
 
 # Gradiente descendente estocástico
-w = sgd(x, y)
+w_sgd = sgd(x, y)
 print ('Bondad del resultado para grad. descendente estocástico:\n')
-print ("Ein: ", Err(x, y, w))
-print ("Eout: ", Err(x_test, y_test, w))
+print ("Ein: ", Err(x, y, w_sgd))
+print ("Eout: ", Err(x_test, y_test, w_sgd))
 
-w = pseudoinverse(x, y)
+w_psi = pseudoinverse(x, y)
 print('\nBondad del resultado para pseudo-inversa:')
-print("  Ein:  ", Err(x, y, w))
-print("  Eout: ", Err(x_test, y_test, w))
+print("  Ein:  ", Err(x, y, w_psi))
+print("  Eout: ", Err(x_test, y_test, w_psi))
+
+wait()
+
+print('Rectas de regresión obtenidas utilizando los algoritmos SGD y Pseudo-Inversa:')
+# Plots
+x_1 = x[np.where(y == -1)[0]]
+x_5 = x[np.where(y == 1)[0]]
+
+scatter = plt.scatter(x_1[:, 1], x_1[:, 2], c='r', edgecolor='k', label='1')
+scatter = plt.scatter(x_5[:, 1], x_5[:, 2], c='b', edgecolor='k', label='5')
+plt.xlabel('Valor medio nivel gris')
+plt.ylabel('Simetría vertical')
+
+plt.plot(x[:,1], (-w_sgd[1]*x[:,1] - w_sgd[0])/w_sgd[2], ls='--' ,label='SGD')
+plt.plot(x[:,1], (-w_psi[1]*x[:,1] - w_psi[0])/w_psi[2], ls='--' ,label='Pseudoinverse')
+plt.legend()
+
+plt.show()
 
 wait()
 
@@ -141,9 +159,11 @@ def simula_unif(N, d, size):
 print ('Ejercicio 2\n')
 print ('Muestra N = 1000, cuadrado [-1,1]x[-1,1]')
 
+print ('Mapa de puntos')
 X = simula_unif(1000, 2, 1)
 plt.plot([a[0] for a in X], [a[1] for a in X], 'bo')
 plt.show()
+wait()
 
 # b) Mapa de etiquetas
 @to_numpy
@@ -157,9 +177,11 @@ y_random = np.random.choice([-1, 1], 100)
 # Join everything
 y = np.hstack((y, y_random))[:, None]
 
+print('Mapa de clases')
 # Generates the label map and
 scatter = plt.scatter(X[:, 0], X[:, 1], c=y.flatten(), cmap=ListedColormap(['r', 'g']))
 plt.show()
+wait()
 
 # c) Ajustar un modelo de regresión lineal utilizando el gradiente descendiente estocástico
 # Creates feature vector
@@ -168,6 +190,20 @@ X = np.array([[1, x[0], x[1]] for x in X])
 w = sgd(X,y)
 print ('Bondad del resultado en el experimento para grad. descendente estocástico: \n')
 print ("Ein: ", Err(X, y, w))
+
+# Plots
+x_a = X[np.where(y == -1)[0]]
+x_b = X[np.where(y == 1)[0]]
+
+scatter = plt.scatter(x_a[:, 1], x_a[:, 2], c='r', edgecolor='k', label='-1')
+scatter = plt.scatter(x_b[:, 1], x_b[:, 2], c='g', edgecolor='k', label='1')
+
+print('Ejemplo regresión lineal')
+plt.plot(x[:,1], (-w[1]*x[:,1] - w[0])/w[2], ls='--')
+plt.legend()
+
+plt.show()
+wait()
 
 # d) Ejecutar el experimento a)-c) 1000 veces
 
@@ -194,13 +230,34 @@ def experiment(linear=True):
     # Test error
     Eout = Err(x_test, y_test, w)
 
-    return Ein, Eout
+    return Ein, Eout, w
+
+# Shows plot with no linear regression
+_, _, w = experiment(linear=False)
+x_a = X[np.where(y == -1)[0]]
+x_b = X[np.where(y == 1)[0]]
+
+scatter = plt.scatter(x_a[:, 1], x_a[:, 2], c='r', edgecolor='k', label='-1')
+scatter = plt.scatter(x_b[:, 1], x_b[:, 2], c='g', edgecolor='k', label='1')
+
+xmin, xmax = X[:, 1].min() - .5, X[:, 1].max() + .5
+ymin, ymax = X[:, 2].min() - .5, X[:, 2].max() + .5
+xp, yp = np.meshgrid(np.linspace(xmin, xmax, 100), np.linspace(ymin, ymax, 100))
+F = -w[0] - w[1] * xp - w[4] * xp * xp
+G = w[2] * yp + w[3] * xp * yp + w[5] * yp * yp
+plt.contour(xp, yp, (G - F), levels = [0])
+
+plt.legend()
+
+print('Ejemplo regresión no lineal')
+plt.show()
+wait()
 
 # Perform the 1000 experiments
 Eins = []
 Eouts = []
 for _ in range(1000):
-    Ein, Eout = experiment()
+    Ein, Eout, _ = experiment()
     Eins.append(Ein)
     Eouts.append(Eout)
 
@@ -215,7 +272,7 @@ print ("Eout media: ", Eout_medio)
 Eins = []
 Eouts = []
 for _ in range(1000):
-    Ein, Eout = experiment(linear=False)
+    Ein, Eout, _ = experiment(linear=False)
     Eins.append(Ein)
     Eouts.append(Eout)
 

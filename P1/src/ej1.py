@@ -21,7 +21,7 @@ def to_numpy(func):
 def wait():
     input("\n--- Pulsar tecla para continuar ---\n")
 
-# Apartado 1.1
+#  Ejercicio 1
 def gradient_descent(w, lr, f, grad_f, max_iters, epsilon=-inf):
     """
     Arguments:
@@ -44,7 +44,7 @@ def gradient_descent(w, lr, f, grad_f, max_iters, epsilon=-inf):
 
     return w, iters
 
-# Apartado 1.2
+#  Ejercicio 2
 # Function to minize: E(u,v) = (ue^v - 2ve^(-u))^2
 
 @to_numpy
@@ -76,7 +76,7 @@ def main_1_2():
 
     wait()
 
-# Apartado 1.3
+#  Ejercicio 3
 # Function to minize: f(x,y) = (x-2)^2 + 2(y+2)^2 + 2sin(2 \pi x)sin(2 \pi y)
 @to_numpy
 def f(x, y):
@@ -101,13 +101,13 @@ def gd_graph(w, lr, f, grad_f, max_iters):
         w = w - lr * grad_f(w)
         iters += 1
 
-    plt.plot(range(max_iters), values_f, 'bo')
+    plt.plot(range(max_iters), values_f, 'bo', linestyle='--')
     plt.xlabel('Iteraciones')
     plt.ylabel('f(x,y)')
     plt.show()
 
 def main_1_3a():
-    w = (1, 1)
+    w = (1, -1)
 
     print ('Resultados ejercicio 2\n')
     print ('\nGrafica con learning rate igual a 0.01')
@@ -151,3 +151,7 @@ def main_1_3b():
     print ('Valor mínimo: ', f(w))
 
     wait()
+
+main_1_2()
+main_1_3a()
+main_1_3b()
