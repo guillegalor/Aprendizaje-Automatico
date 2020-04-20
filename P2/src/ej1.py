@@ -103,12 +103,13 @@ wait()
 
 # 1.2.b. Dibujar una gráfica donde los puntos muestren el resultado de su etiqueta, junto con la recta usada para ello
 # Array con 10% de indices aleatorios para introducir ruido
+y_noise = y.copy()
 
 # Modifica un 10% aleatorio de cada etiqueta
 for etiq in {-1, 1}:
   y_lab = np.nonzero(y == etiq)[0]
   y_rand = np.random.choice(y_lab, math.ceil(0.1*len(y_lab)), replace=False)
-  y[y_rand] = -y[y_rand]
+  y_noise[y_rand] = -y_noise[y_rand]
 
 plt.scatter(X[:, 0], X[:, 1], c=y.flatten(), cmap=ListedColormap(['r', 'g']))
 plt.plot(-50, a*(-50 ) + b, 50, a*(50) + b)
@@ -218,13 +219,13 @@ for i in range(0,10):
 
 print('Valor medio de iteraciones necesario para converger: {}'.format(np.mean(np.asarray(iterations))))
 
-input("\n--- Pulsar tecla para continuar ---\n")
+wait()
 
 # Ahora con los datos del ejercicio 1.2.b
 
 #CODIGO DEL ESTUDIANTE
 
-input("\n--- Pulsar tecla para continuar ---\n")
+wait()
 
 ###############################################################################
 ###############################################################################
@@ -239,14 +240,14 @@ def sgdRL(?):
 
 #CODIGO DEL ESTUDIANTE
 
-input("\n--- Pulsar tecla para continuar ---\n")
+wait()
 
 # Usar la muestra de datos etiquetada para encontrar nuestra solución g y estimar Eout
 # usando para ello un número suficientemente grande de nuevas muestras (>999).
 
 #CODIGO DEL ESTUDIANTE
 
-input("\n--- Pulsar tecla para continuar ---\n")
+wait()
 
 ###############################################################################
 ###############################################################################
@@ -296,19 +297,19 @@ ax.set_xlim((0, 1))
 plt.legend()
 plt.show()
 
-input("\n--- Pulsar tecla para continuar ---\n")
+wait()
 
 #LINEAR REGRESSION FOR CLASSIFICATION
 
 #CODIGO DEL ESTUDIANTE
 
-input("\n--- Pulsar tecla para continuar ---\n")
+wait()
 
 #POCKET ALGORITHM
 
 #CODIGO DEL ESTUDIANTE
 
-input("\n--- Pulsar tecla para continuar ---\n")
+wait()
 
 #COTA SOBRE EL ERROR
 
