@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 """
 TRABAJO 2
-Nombre Estudiante:
+Nombre Estudiante: Guillermo Galindo Ortuño
 """
+import math
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -22,7 +23,7 @@ def to_numpy(func):
     return numpy_func
 
 def wait():
-    input("\n--- Pulsar tecla para continuar ---\n")
+    input("\n--- Pulsar ENTER para continuar ---\n")
 
 #----------------------------------------#
 
@@ -183,9 +184,30 @@ wait()
 # EJERCICIO 2.1: ALGORITMO PERCEPTRON
 
 def ajusta_PLA(datos, label, max_iter, vini):
-    #CODIGO DEL ESTUDIANTE
+    """
+    Calcula el hiperplano solución a un problema de clasificación binaria.
+    Argumentos:
+        * datos    : matriz con los datos
+        * label    : vector de etiquetas
+        * max_iter : máximo de iteraciones permitidas
+        * vini     : valor inicial
+    Return:
+        * w        : vector de pesos
+        * iters    : número de iteraciones
+    """
 
-    # return ?
+    w  = vini.copy()
+
+    for i in range(max_iter):
+        w_old = w.copy()
+
+        for item, label in zip(datos, labels):
+            if signo(w.dot(item)) != label:
+                w += label * item
+        if np.all(w = w_old):
+            return w, it
+
+    return w, it
 
 #CODIGO DEL ESTUDIANTE
 
