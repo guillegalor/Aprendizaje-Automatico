@@ -6,6 +6,7 @@ Nombre Estudiante: Guillermo Galindo Ortuño
 import math
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.colors import ListedColormap
 
 #----------------------------------------#
 #---------- Auxiliar Functions ----------#
@@ -61,15 +62,15 @@ def simula_recta(intervalo):
 x = simula_unif(50, 2, [-50,50])
 
 plt.plot([a[0] for a in x], [a[1] for a in x], 'bo')
-plt.show()
 plt.title('Nube de puntos uniforme')
+plt.show()
 wait()
 
 x = simula_gaus(50, 2, np.array([5,7]))
 
 plt.plot([a[0] for a in x], [a[1] for a in x], 'bo')
-plt.show()
 plt.title('Nube de puntos gaussiana')
+plt.show()
 wait()
 
 ###############################################################################
@@ -87,16 +88,37 @@ def signo(x):
 def f(x, y, a, b):
 	return signo(y - a*x - b)
 
-# Parámetors de la recta a la que calcularemos la distancia
-a, b = simula_recta([-50, 50])
-distancia_recta = lambda x, y : f(x, y, a, b)
+def genera_datos(intervalo, num_datos, dim):
+    """
+    Genera recta y datos uniformes en un intervalo.
+    Argumentos:
+        * intervalo : intervalo en el que están todos los datos
+        * num_datos : numero de vectores de datos
+        * dim       : dimensión de cada vector de datos
+    Returns:
+        * a, b : Parametros de la recta (ax + b)
+        * X    : conjunto de datos
+        * y    : conjunto de etiquetas
+    """
 
-X = simula_unif(100, 2, [-50,50])
-y = distancia_recta(X[:,0], X[:,1])
+    a, b = simula_recta(intervalo)
+
+    X = simula_unif(num_datos, dim, intervalo)
+    y = np.empty((num_datos,))
+    for i in range(num_datos):
+        y[i] = f(X[i, 0], X[i, 1], a, b)
+
+    return a, b, X, y
+
+intervalo = [-50,50]
+N = 100
+
+a, b, X, y = genera_datos(intervalo, N, 2)
 
 # Muestra las etiquetas
 plt.scatter(X[:, 0], X[:, 1], c=y.flatten(), cmap=ListedColormap(['r', 'g']))
-plt.plot(-50, a*(-50 ) + b, 50, a*(50) + b)
+plt.plot([-50, 50], [a*(-50 ) + b, a*(50) + b])
+plt.title('Nube de puntos clasificada sin ruido')
 plt.show()
 
 wait()
@@ -106,13 +128,14 @@ wait()
 y_noise = y.copy()
 
 # Modifica un 10% aleatorio de cada etiqueta
-for etiq in {-1, 1}:
-  y_lab = np.nonzero(y == etiq)[0]
+for label in {-1, 1}:
+  y_lab = np.nonzero(y == label)[0]
   y_rand = np.random.choice(y_lab, math.ceil(0.1*len(y_lab)), replace=False)
   y_noise[y_rand] = -y_noise[y_rand]
 
-plt.scatter(X[:, 0], X[:, 1], c=y.flatten(), cmap=ListedColormap(['r', 'g']))
-plt.plot(-50, a*(-50 ) + b, 50, a*(50) + b)
+plt.scatter(X[:, 0], X[:, 1], c=y_noise.flatten(), cmap=ListedColormap(['r', 'g']))
+plt.plot([-50, 50], [a*(-50 ) + b, a*(50) + b])
+plt.title('Nube de puntos clasificada con ruido')
 plt.show()
 
 wait()
@@ -158,11 +181,11 @@ def plot_datos_cuad(X, y, fz, title='Point cloud plot', xaxis='x axis', yaxis='y
     plt.show()
 
 clasificadores = [
-    lambda x,y : y - a*x - b,
-    lambda x,y : (x-10)**2 + (y-20)**2 - 400,
-    lambda x,y : 0.5*(x+10)**2 + (y-20)**2 - 400,
-    lambda x,y : 0.5*(x-10)**2 - (y+20)**2 - 400,
-    lambda x,y : y - 20*x^2 - 5*x + 3
+    lambda x: x[:, 1] - a*x[:, 0] - b,
+    lambda x: (x[:, 0]-10)**2 + (x[:, 1]-20)**2 - 400,
+    lambda x: 0.5*(x[:, 0]+10)**2 + (x[:, 1]-20)**2 - 400,
+    lambda x: 0.5*(x[:, 0]-10)**2 - (x[:, 1]+20)**2 - 400,
+    lambda x: x[:, 1] - 20*x[:, 0]**2 - 5*x[:, 0] + 3
 ]
 
 titulos = [
@@ -174,7 +197,7 @@ titulos = [
 ]
 
 for clasif, titulo in zip(clasificadores, titulos):
-    plot_datos_cuad(X, y, clasif, titulo)
+    plot_datos_cuad(X, y_noise, clasif, title=titulo)
 
 wait()
 
@@ -182,13 +205,16 @@ wait()
 ###############################################################################
 ###############################################################################
 
+# Datos con coordenada homogénea
+X_h = np.hstack((np.ones((N,1)), X))
+
 # EJERCICIO 2.1: ALGORITMO PERCEPTRON
 
-def ajusta_PLA(datos, label, max_iter, vini):
+def ajusta_PLA(datos, labels, max_iter, vini):
     """
     Calcula el hiperplano solución a un problema de clasificación binaria.
     Argumentos:
-        * datos    : matriz con los datos
+        * datos    : matriz con los datos (con coordenada homogénea)
         * label    : vector de etiquetas
         * max_iter : máximo de iteraciones permitidas
         * vini     : valor inicial
@@ -205,17 +231,24 @@ def ajusta_PLA(datos, label, max_iter, vini):
         for item, label in zip(datos, labels):
             if signo(w.dot(item)) != label:
                 w += label * item
-        if np.all(w = w_old):
-            return w, it
+        if np.all(w == w_old):
+            return w, i+1
 
-    return w, it
+    return w, i+1
 
-#CODIGO DEL ESTUDIANTE
+# Parameters
+max_iters = 1000
+num_coords = np.shape(X_h)[1]
+
+# Initial vector 0
+vini_0 = np.zeros(num_coords)
+w_0, it_0 = ajusta_PLA(X_h, y, max_iters, vini_0)
 
 # Random initializations
 iterations = []
 for i in range(0,10):
-    #CODIGO DEL ESTUDIANTE
+    w, iters = ajusta_PLA(X_h, y, max_iters, np.random.rand(num_coords))
+    iterations.append(iters)
 
 print('Valor medio de iteraciones necesario para converger: {}'.format(np.mean(np.asarray(iterations))))
 
@@ -223,7 +256,17 @@ wait()
 
 # Ahora con los datos del ejercicio 1.2.b
 
-#CODIGO DEL ESTUDIANTE
+# Initial vector 0
+vini_0 = np.zeros(num_coords)
+w_0, it_0 = ajusta_PLA(X_h, y_noise, max_iters, vini_0)
+
+# Random initializations
+iterations = []
+for i in range(0,10):
+    w, iters = ajusta_PLA(X_h, y_noise, max_iters, np.random.rand(num_coords))
+    iterations.append(iters)
+
+print('Valor medio de iteraciones necesario para converger (datos con ruido): {}'.format(np.mean(np.asarray(iterations))))
 
 wait()
 
@@ -233,12 +276,54 @@ wait()
 
 # EJERCICIO 3: REGRESIÓN LOGÍSTICA CON STOCHASTIC GRADIENT DESCENT
 
-def sgdRL(?):
-    #CODIGO DEL ESTUDIANTE
+def ErrRL(x, y, w):
+    return np.mean(np.log(1 + np.exp(-y.dot(x.dot(w).T))))
+
+def gradErrLR(x, y, w):
+    return -np.mean((y.dot(x))/(1 + np.exp(y.dot(x.dot(w).T))))
+
+def sgdRL(datos, labels, eta=0.01, batch_size=1):
+    """
+    Algoritmo de regresión logística utilizando
+    el SGD
+    Argumentos:
+        * datos      : matriz con los datos (con coordenada homogénea)
+        * label      : vector de etiquetas
+        * eta        : tasa de aprendizaje
+        * batch_size : tamaño del batch
+    Return:
+        * w          : vector de pesos
+    """
+
+    N, dim = datos.shape
+    w = np.zeros(dim)
+    min_reached = False
+    idxs = np.arange(N)
+    batch_start = 0
+
+    while not min_reached:
+        w_old = w.copy()
+        if batch_start == 0:
+            np.random.shuffle(idxs)
+
+        batch_idxs = idxs[batch_start: batch_start + batch_size]
+        w = w - eta*gradErrLR(datos[batch_idxs], labels[batch_idxs][None, :], w)
+
+        min_reached = np.linalg.norm(w - w_old) <= 0.01
+
+        if batch_start >= N:
+            batch_start = 0
 
     return w
 
-#CODIGO DEL ESTUDIANTE
+intervalo = [0,2]
+d = 2
+N = 100
+
+a, b, X, y = genera_datos(intervalo, N, d)
+X_h = np.hstack((np.ones((N, 1)), X))
+
+w = sgdRL(X_h, y)
 
 wait()
 
@@ -246,6 +331,15 @@ wait()
 # usando para ello un número suficientemente grande de nuevas muestras (>999).
 
 #CODIGO DEL ESTUDIANTE
+N_test = 1000
+X_test = simula_unif(N_test, 2, intervalo)
+X_test_h = np.hstack((np.ones((N_test, 1)), X_test))
+
+y_test = np.empty((N_test, ))
+for i in range(N_test):
+    y_test[i] = f(X_test[i, 0], X_test[i, 1], a, b)
+
+print("Error: {}".format(ErrRL(X_test_h, y_test[None, :], w)))
 
 wait()
 
@@ -276,9 +370,9 @@ def readData(file_x, file_y, digits, labels):
 	return x, y
 
 # Lectura de los datos de entrenamiento
-x, y = readData('datos/X_train.npy', 'datos/y_train.npy', [4,8], [-1,1])
+x, y = readData('data/X_train.npy', 'data/y_train.npy', [4,8], [-1,1])
 # Lectura de los datos para el test
-x_test, y_test = readData('datos/X_test.npy', 'datos/y_test.npy', [4,8], [-1,1])
+x_test, y_test = readData('data/X_test.npy', 'data/y_test.npy', [4,8], [-1,1])
 
 #mostramos los datos
 fig, ax = plt.subplots()
