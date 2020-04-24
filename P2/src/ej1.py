@@ -199,6 +199,17 @@ titulos = [
 for clasif, titulo in zip(clasificadores, titulos):
     plot_datos_cuad(X, y_noise, clasif, title=titulo)
 
+def Err(datos, labels, clasificador):
+    """
+    Calcula el error de clasificación
+    Argumentos:
+        * datos        : matriz con las datos
+        * labels       : vector de etiquetas
+        * clasificador : función que clasifica
+    """
+    correct_labels = [clasificador(x) for x in datos]
+    return np.mean(labels != correct_labels)
+
 wait()
 
 ###############################################################################
@@ -215,7 +226,7 @@ def ajusta_PLA(datos, labels, max_iter, vini):
     Calcula el hiperplano solución a un problema de clasificación binaria.
     Argumentos:
         * datos    : matriz con los datos (con coordenada homogénea)
-        * label    : vector de etiquetas
+        * labels   : vector de etiquetas
         * max_iter : máximo de iteraciones permitidas
         * vini     : valor inicial
     Return:
@@ -370,9 +381,9 @@ def readData(file_x, file_y, digits, labels):
 	return x, y
 
 # Lectura de los datos de entrenamiento
-x, y = readData('data/X_train.npy', 'data/y_train.npy', [4,8], [-1,1])
+x, y = readData('../data/X_train.npy', '../data/y_train.npy', [4,8], [-1,1])
 # Lectura de los datos para el test
-x_test, y_test = readData('data/X_test.npy', 'data/y_test.npy', [4,8], [-1,1])
+x_test, y_test = readData('../data/X_test.npy', '../data/y_test.npy', [4,8], [-1,1])
 
 #mostramos los datos
 fig, ax = plt.subplots()
@@ -395,16 +406,104 @@ wait()
 
 #LINEAR REGRESSION FOR CLASSIFICATION
 
-#CODIGO DEL ESTUDIANTE
+def pseudoinverse(x, y):
+    """
+    Pseudoinverse algorithm applied to linear regression
+    - x              : Data (array of arrays with features of each element)
+    - y              : Labels for each element
+    """
+
+    u, s, v = np.linalg.svd(x)
+    d = np.diag([0 if np.allclose(p, 0) else 1/p for p in s])
+    pseudoinverse = v.T.dot(d).dot(d).dot(v).dot(x.T)
+    return pseudoinverse.dot(y)
+
+w_lin = pseudoinverse(x, y)
 
 wait()
 
 #POCKET ALGORITHM
 
-#CODIGO DEL ESTUDIANTE
+def PLAPocket(datos, labels, max_iter, vini):
+    """
+    Calcula el hiperplano solución a un problema de clasificación binaria.
+    Argumentos:
+        * datos    : matriz con los datos (con coordenada homogénea)
+        * label    : vector de etiquetas
+        * max_iter : máximo de iteraciones permitidas
+        * vini     : valor inicial
+    Return:
+        * w        : vector de pesos
+        * iters    : número de iteraciones
+    """
+    w  = vini.copy()
+    w_best = w.copy()
+    err_best = Err(datos, labels, lambda x: signo(x.dot(w_best)))
+
+    for i in range(max_iter):
+        w_old = w.copy()
+
+        for item, label in zip(datos, labels):
+            if signo(w.dot(item)) != label:
+                w += label * item
+
+        err = Err(datos, labels, lambda x: signo(x.dot(w)))
+        if err < err_best:
+            w_best = w.copy()
+            err_best = err
+
+        if np.all(w == w_old):
+            return w_best, i+1
+
+    return w_best, i+1
+
+# A partir de la regresión lineal
+w_pla, _ = PLAPocket(x, y, 1000, w_lin)
+
+# A partir del vector 0
+w_pla_cero, _ = PLAPocket(x, y, 1000, np.random.rand(3))
+
+rectas = [w_lin, w_pla, w_pla_cero]
+titulos = ['Regresión lineal', 'PLA-Pocket (RL)', 'PLA-Pocket (random)']
+
+plt.scatter(x[:, 1], x[:, 2], c=y.flatten(), cmap=ListedColormap(['r', 'g']))
+for w_recta, titulo in zip(rectas, titulos):
+    plt.plot(x[:,1], (-w_recta[1]*x[:,1] - w_recta[0])/w_recta[2], ls='--' ,label=titulo)
+
+plt.title('Digitos Manuscritos con rectas estimadas (training)')
+plt.show()
+
+plt.scatter(x_test[:, 1], x_test[:, 2], c=y_test.flatten(), cmap=ListedColormap(['r', 'g']))
+for w_recta, titulo in zip(rectas, titulos):
+    plt.plot(x_test[:,1], (-w_recta[1]*x_test[:,1] - w_recta[0])/w_recta[2], ls='--' ,label=titulo)
+
+plt.title('Digitos Manuscritos con rectas estimadas (test)')
+plt.show()
 
 wait()
 
 #COTA SOBRE EL ERROR
+def cota(err, N, delta, M):
+    """
+    Calcula cota superior de Eout
+    Argumentos:
+        * err: error estimado
+        * N: tamaño de la muetra
+        * delta: tolerancia a error
+    Return:
+        * Cota superior de Eout
+    """
 
-#CODIGO DEL ESTUDIANTE
+    return err + np.sqrt(1/(2*N)*(np.log(2*M/delta)))
+
+Nin = len(x)
+Ntest = len(x_test)
+delta = 0.05
+cardinality_Ein = 2**65 + 2**129
+cardinality_Etest = 1
+
+Ein = Err(x, y, lambda x: signo(x.dot(w_pla)))
+Etest = Err(x_test, y_test, lambda x: signo(x.dot(w_pla)))
+print("Apartado 3.2.c")
+print("Cota superior de Eout (con Ein)  : {}".format(cota(Ein, Nin, delta, cardinality_Ein)))
+print("Cota superior de Eout (con Etest): {}".format(cota(Etest, Ntest, delta, cardinality_Etest)))
