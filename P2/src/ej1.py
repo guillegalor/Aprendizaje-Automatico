@@ -58,7 +58,8 @@ def simula_recta(intervalo):
     return a, b
 
 # EJERCICIO 1.1: Dibujar una gráfica con la nube de puntos de salida correspondiente
-
+print("Ejercicio 1.1")
+print("Apartado a)")
 x = simula_unif(50, 2, [-50,50])
 
 plt.plot([a[0] for a in x], [a[1] for a in x], 'bo')
@@ -66,6 +67,7 @@ plt.title('Nube de puntos uniforme')
 plt.show()
 wait()
 
+print("Apartado b)")
 x = simula_gaus(50, 2, np.array([5,7]))
 
 plt.plot([a[0] for a in x], [a[1] for a in x], 'bo')
@@ -78,6 +80,7 @@ wait()
 ###############################################################################
 
 # EJERCICIO 1.2: Dibujar una gráfica con la nube de puntos de salida correspondiente
+print("Ejercicio 1.2")
 
 # La funcion np.sign(0) da 0, lo que nos puede dar problemas
 def signo(x):
@@ -115,10 +118,11 @@ N = 100
 
 a, b, X, y = genera_datos(intervalo, N, 2)
 
+print("Apartado a)")
 # Muestra las etiquetas
 plt.scatter(X[:, 0], X[:, 1], c=y.flatten(), cmap=ListedColormap(['r', 'g']))
 plt.plot([-50, 50], [a*(-50 ) + b, a*(50) + b])
-plt.title('Nube de puntos clasificada sin ruido')
+plt.title('Nube de puntos clasificada sin ruido. Recta y = ' + str(round(a,3)) + 'x + ' + str(round(b,3)) + '.' )
 plt.show()
 
 wait()
@@ -133,9 +137,10 @@ for label in {-1, 1}:
   y_rand = np.random.choice(y_lab, math.ceil(0.1*len(y_lab)), replace=False)
   y_noise[y_rand] = -y_noise[y_rand]
 
+print("Apartado b)")
 plt.scatter(X[:, 0], X[:, 1], c=y_noise.flatten(), cmap=ListedColormap(['r', 'g']))
 plt.plot([-50, 50], [a*(-50 ) + b, a*(50) + b])
-plt.title('Nube de puntos clasificada con ruido')
+plt.title('Nube de puntos clasificada con ruido. Recta y = ' + str(round(a,3)) + 'x + ' + str(round(b,3)) + '.' )
 plt.show()
 
 wait()
@@ -144,7 +149,8 @@ wait()
 ###############################################################################
 ###############################################################################
 
-# EJERCICIO 1.3: Supongamos ahora que las siguientes funciones definen la frontera de clasificación de los puntos de la muestra en lugar de una recta
+# EJERCICIO 1.2 c): Supongamos ahora que las siguientes funciones definen la frontera de clasificación de los puntos de la muestra en lugar de una recta
+print("Apartado c)")
 
 def plot_datos_cuad(X, y, fz, title='Point cloud plot', xaxis='x axis', yaxis='y axis'):
     #Preparar datos
@@ -196,19 +202,21 @@ titulos = [
     ' Parábola ',
 ]
 
-for clasif, titulo in zip(clasificadores, titulos):
-    plot_datos_cuad(X, y_noise, clasif, title=titulo)
-
 def Err(datos, labels, clasificador):
     """
     Calcula el error de clasificación
     Argumentos:
         * datos        : matriz con las datos
         * labels       : vector de etiquetas
-        * clasificador : función que clasifica
+        * clasificador : función que clasifica todo el conjunto de datos
     """
-    correct_labels = [clasificador(x) for x in datos]
+    correct_labels = clasificador(datos)
     return np.mean(labels != correct_labels)
+
+# Muestra las regiones formadas junto con los errores al clasificar
+for clasif, titulo in zip(clasificadores, titulos):
+    plot_datos_cuad(X, y_noise, clasif, title=titulo)
+    print("Error de clasificación en '{}': {}".format(titulo, Err(X, y_noise, lambda x: np.sign(clasif(x)))))
 
 wait()
 
@@ -261,7 +269,11 @@ for i in range(0,10):
     w, iters = ajusta_PLA(X_h, y, max_iters, np.random.rand(num_coords))
     iterations.append(iters)
 
-print('Valor medio de iteraciones necesario para converger: {}'.format(np.mean(np.asarray(iterations))))
+print('Ejercicio 2.')
+print('a) Algoritmo de aprendizaje del perceptrón')
+print('1) Resultados sobre datos sin ruido')
+print('Número de iteraciones necesarias para converger (vector inicial 0): {}'.format(it_0))
+print('Valor medio de iteraciones necesario para converger (vectores iniciales aleatorios): {}'.format(np.mean(np.asarray(iterations))))
 
 wait()
 
@@ -277,13 +289,16 @@ for i in range(0,10):
     w, iters = ajusta_PLA(X_h, y_noise, max_iters, np.random.rand(num_coords))
     iterations.append(iters)
 
-print('Valor medio de iteraciones necesario para converger (datos con ruido): {}'.format(np.mean(np.asarray(iterations))))
+print('2) Resultados sobre datos con ruido')
+print('Número de iteraciones necesarias para converger (vector inicial 0): {}'.format(it_0))
+print('Valor medio de iteraciones necesario para converger (vectores iniciales aleatorios): {}'.format(np.mean(np.asarray(iterations))))
 
 wait()
 
 ###############################################################################
 ###############################################################################
 ###############################################################################
+print('b) Regresión Logística')
 
 # EJERCICIO 3: REGRESIÓN LOGÍSTICA CON STOCHASTIC GRADIENT DESCENT
 
@@ -327,6 +342,9 @@ def sgdRL(datos, labels, eta=0.01, batch_size=1):
 
     return w
 
+# Usar la muestra de datos etiquetada para encontrar nuestra solución g y estimar Eout
+# usando para ello un número suficientemente grande de nuevas muestras (>999).
+
 intervalo = [0,2]
 d = 2
 N = 100
@@ -336,12 +354,6 @@ X_h = np.hstack((np.ones((N, 1)), X))
 
 w = sgdRL(X_h, y)
 
-wait()
-
-# Usar la muestra de datos etiquetada para encontrar nuestra solución g y estimar Eout
-# usando para ello un número suficientemente grande de nuevas muestras (>999).
-
-#CODIGO DEL ESTUDIANTE
 N_test = 1000
 X_test = simula_unif(N_test, 2, intervalo)
 X_test_h = np.hstack((np.ones((N_test, 1)), X_test))
@@ -350,7 +362,7 @@ y_test = np.empty((N_test, ))
 for i in range(N_test):
     y_test[i] = f(X_test[i, 0], X_test[i, 1], a, b)
 
-print("Error: {}".format(ErrRL(X_test_h, y_test[None, :], w)))
+print("Estimación Eout: {}".format(ErrRL(X_test_h, y_test[None, :], w)))
 
 wait()
 
@@ -358,27 +370,28 @@ wait()
 ###############################################################################
 ###############################################################################
 #BONUS: Clasificación de Dígitos
+print("Ejercicio 3. Bonus.")
 
 # Funcion para leer los datos
 def readData(file_x, file_y, digits, labels):
-	# Leemos los ficheros
-	datax = np.load(file_x)
-	datay = np.load(file_y)
-	y = []
-	x = []
-	# Solo guardamos los datos cuya clase sea la digits[0] o la digits[1]
-	for i in range(0,datay.size):
-		if datay[i] == digits[0] or datay[i] == digits[1]:
-			if datay[i] == digits[0]:
-				y.append(labels[0])
-			else:
-				y.append(labels[1])
-			x.append(np.array([1, datax[i][0], datax[i][1]]))
+    # Leemos los ficheros
+    datax = np.load(file_x)
+    datay = np.load(file_y)
+    y = []
+    x = []
+    # Solo guardamos los datos cuya clase sea la digits[0] o la digits[1]
+    for i in range(0,datay.size):
+            if datay[i] == digits[0] or datay[i] == digits[1]:
+                    if datay[i] == digits[0]:
+                            y.append(labels[0])
+                    else:
+                            y.append(labels[1])
+                    x.append(np.array([1, datax[i][0], datax[i][1]]))
 
-	x = np.array(x, np.float64)
-	y = np.array(y, np.float64)
+    x = np.array(x, np.float64)
+    y = np.array(y, np.float64)
 
-	return x, y
+    return x, y
 
 # Lectura de los datos de entrenamiento
 x, y = readData('../data/X_train.npy', '../data/y_train.npy', [4,8], [-1,1])
@@ -420,8 +433,6 @@ def pseudoinverse(x, y):
 
 w_lin = pseudoinverse(x, y)
 
-wait()
-
 #POCKET ALGORITHM
 
 def PLAPocket(datos, labels, max_iter, vini):
@@ -438,7 +449,7 @@ def PLAPocket(datos, labels, max_iter, vini):
     """
     w  = vini.copy()
     w_best = w.copy()
-    err_best = Err(datos, labels, lambda x: signo(x.dot(w_best)))
+    err_best = Err(datos, labels, lambda x: np.sign(x.dot(w_best)))
 
     for i in range(max_iter):
         w_old = w.copy()
@@ -447,7 +458,7 @@ def PLAPocket(datos, labels, max_iter, vini):
             if signo(w.dot(item)) != label:
                 w += label * item
 
-        err = Err(datos, labels, lambda x: signo(x.dot(w)))
+        err = Err(datos, labels, lambda x: np.sign(x.dot(w)))
         if err < err_best:
             w_best = w.copy()
             err_best = err
@@ -502,8 +513,8 @@ delta = 0.05
 cardinality_Ein = 2**65 + 2**129
 cardinality_Etest = 1
 
-Ein = Err(x, y, lambda x: signo(x.dot(w_pla)))
-Etest = Err(x_test, y_test, lambda x: signo(x.dot(w_pla)))
+Ein = Err(x, y, lambda x: np.sign(x.dot(w_pla)))
+Etest = Err(x_test, y_test, lambda x: np.sign(x.dot(w_pla)))
 print("Apartado 3.2.c")
-print("Cota superior de Eout (con Ein)  : {}".format(cota(Ein, Nin, delta, cardinality_Ein)))
-print("Cota superior de Eout (con Etest): {}".format(cota(Etest, Ntest, delta, cardinality_Etest)))
+print("Cota superior de Eout (basada en Ein)  : {}".format(cota(Ein, Nin, delta, cardinality_Ein)))
+print("Cota superior de Eout (basada en Etest): {}".format(cota(Etest, Ntest, delta, cardinality_Etest)))
